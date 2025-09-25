@@ -25,8 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderMenu() {
         menuListContainer.innerHTML = '';
+        if (!menuData || menuData.length === 0) {
+            menuListContainer.innerHTML = '<p>No se encontraron productos. Abre la página de ventas (index.html) primero para crear el menú inicial.</p>';
+            return;
+        }
+
         const groupedByCategory = menuData.reduce((acc, category) => {
-            acc[category.category] = category.items;
+            if(category && category.category) {
+               acc[category.category] = category.items;
+            }
             return acc;
         }, {});
 
@@ -63,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Esta función se encarga de procesar tanto la creación como la edición.
     function handleFormSubmit(e) {
         e.preventDefault();
         const id = parseInt(productIdInput.value);
@@ -77,29 +83,27 @@ document.addEventListener('DOMContentLoaded', () => {
             grande: document.getElementById('price-grande').value || null,
         };
 
-        // Si hay un ID, significa que estamos EDITANDO.
         if (id) {
             productData.id = id;
             let foundAndUpdated = false;
             
-            // Recorremos el menú para encontrar y actualizar el producto.
             menuData.forEach(cat => {
                 const itemIndex = cat.items.findIndex(item => item.id === id);
                 if (itemIndex > -1) {
-                    // Si la categoría cambió, debemos mover el producto de una categoría a otra.
                     if (cat.category !== productData.category) {
-                        cat.items.splice(itemIndex, 1); // Remover del array de la categoría vieja.
-                        addProduct(productData); // Añadir al array de la categoría nueva (o existente).
+                        cat.items.splice(itemIndex, 1);
+                        addProduct(productData);
                     } else {
-                        // Si la categoría no cambió, simplemente actualizamos el producto en su lugar.
                         cat.items[itemIndex] = { ...cat.items[itemIndex], ...productData };
                     }
                     foundAndUpdated = true;
                 }
             });
+             // Limpiar categorías vacías después de mover un producto
+             menuData = menuData.filter(cat => cat.items && cat.items.length > 0);
 
-        } else { // Si no hay ID, estamos CREANDO un producto nuevo.
-            productData.id = Date.now(); // ID único basado en la fecha.
+        } else {
+            productData.id = Date.now();
             addProduct(productData);
         }
         
@@ -116,8 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Esta es la función clave que se activa al presionar "Editar".
-    // Rellena el formulario con los datos del producto seleccionado.
     function populateFormForEdit(id) {
         let itemToEdit;
         let categoryOfItem = '';
@@ -142,22 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('price-mediano').value = itemToEdit.mediano || '';
             document.getElementById('price-grande').value = itemToEdit.grande || '';
             cancelBtn.style.display = 'inline-block';
-            window.scrollTo(0, 0); // Llevar la vista al tope de la página para ver el formulario.
+            window.scrollTo(0, 0);
         }
     }
 
     function deleteProduct(id) {
         if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
         
-        let categoriesToDelete = [];
         menuData.forEach((cat, index) => {
             cat.items = cat.items.filter(item => item.id !== id);
-            if (cat.items.length === 0) {
-                categoriesToDelete.push(cat.category);
-            }
         });
-
-        // Eliminar categorías que quedaron vacías
         menuData = menuData.filter(cat => cat.items.length > 0);
         
         saveMenu();
@@ -174,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', handleFormSubmit);
     cancelBtn.addEventListener('click', resetForm);
     menuListContainer.addEventListener('click', (e) => {
+        if (!e.target) return;
         const id = parseInt(e.target.dataset.id);
         if (e.target.classList.contains('edit-btn')) {
             populateFormForEdit(id);
