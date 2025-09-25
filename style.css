@@ -28,6 +28,31 @@ header {
     padding: 1rem 2rem;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    /* --- Añade esto al final de style.css --- */
+
+/* Estilos para la Notificación de Actualización */
+#update-notification {
+    background-color: #28a745;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-weight: 600;
+    position: fixed;
+    top: -50px; /* Empieza oculto arriba */
+    left: 0;
+    width: 100%;
+    z-index: 2000;
+    transition: top 0.5s ease-in-out;
+}
+
+#update-notification.show {
+    top: 0; /* Se desliza hacia abajo para mostrarse */
+}
+
+/* Para ocultar con JS después de la animación */
+.hidden {
+    display: none;
+}
 }
 header h1 { margin: 0; }
 header nav { margin-top: 10px; }
@@ -135,3 +160,4 @@ footer { text-align: center; padding: 1rem 0; margin-top: 20px; background-color
 .summary-card { text-align: center; }
 
 /* ... (El resto de estilos de reportes y admin funcionan bien, pero se beneficiarán de la nueva fuente y colores base) ... */
+
