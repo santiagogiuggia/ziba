@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes de Venta - Café del Día</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Reportes de Venta</h1>
+        <nav>
+            <a href="index.html">Volver al Punto de Venta</a>
+        </nav>
+    </header>
+
+    <main id="reports-main">
+        <section class="report-filters card">
+            <h2>Filtrar Reportes</h2>
+            <div class="filter-group">
+                <label for="startDate">Desde:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="filter-group">
+                <label for="endDate">Hasta:</label>
+                <input type="date" id="endDate">
+            </div>
+            <button id="filterBtn">Aplicar Filtro</button>
+            <button id="resetBtn">Mostrar Todo</button>
+        </section>
+
+        <section class="report-summary">
+            <div class="summary-card card">
+                <h3>Ventas Totales</h3>
+                <p id="totalRevenue">$0</p>
+            </div>
+            <div class="summary-card card">
+                <h3>N° de Tickets</h3>
+                <p id="totalTickets">0</p>
+            </div>
+            <div class="summary-card card">
+                <h3>Ticket Promedio</h3>
+                <p id="averageTicket">$0</p>
+            </div>
+            <div class="summary-card card">
+                <h3>Producto Estrella</h3>
+                <p id="topProduct">-</p>
+            </div>
+        </section>
+
+        <section class="report-charts card">
+            <h2>Visualización de Datos</h2>
+            <div class="chart-container">
+                <canvas id="topProductsChart"></canvas>
+            </div>
+        </section>
+
+        <section class="report-table card">
+            <h2>Detalle de Ventas</h2>
+            <table id="salesDetailTable">
+                <thead>
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Fecha</th>
+                        <th>N° Items</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </section>
+
+        <section class="report-actions card">
+            <h2>Acciones</h2>
+            <button id="clearDataBtn" class="danger">Borrar Historial de Ventas</button>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Café del Día. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="reportes.js"></script>
+</body>
+</html>
