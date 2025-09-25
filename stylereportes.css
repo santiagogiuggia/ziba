@@ -1,0 +1,48 @@
+/* --- Añade esto al final de style.css --- */
+
+/* Estilos para el Cierre de Caja */
+.daily-summary h2 {
+    text-align: center;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.daily-products-sold {
+    margin-top: 30px;
+}
+
+.daily-products-sold h3 {
+    color: var(--secondary-color);
+}
+
+#daily-products-list {
+    list-style-type: none;
+    padding: 0;
+    column-count: 2; /* Muestra la lista en dos columnas si hay espacio */
+    column-gap: 20px;
+}
+
+#daily-products-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Contenedor de Gráficos */
+.charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.chart-wrapper {
+    flex: 1;
+    min-width: 300px;
+    height: 400px;
+    position: relative;
+}
+
+canvas {
+    max-height: 100%;
+}
