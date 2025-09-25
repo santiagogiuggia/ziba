@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Esta función se encarga de procesar tanto la creación como la edición.
     function handleFormSubmit(e) {
         e.preventDefault();
         const id = parseInt(productIdInput.value);
@@ -76,23 +77,29 @@ document.addEventListener('DOMContentLoaded', () => {
             grande: document.getElementById('price-grande').value || null,
         };
 
-        if (id) { // Editando
+        // Si hay un ID, significa que estamos EDITANDO.
+        if (id) {
             productData.id = id;
-            // Encontrar y actualizar el producto
+            let foundAndUpdated = false;
+            
+            // Recorremos el menú para encontrar y actualizar el producto.
             menuData.forEach(cat => {
                 const itemIndex = cat.items.findIndex(item => item.id === id);
                 if (itemIndex > -1) {
-                    // Si la categoría cambió, hay que mover el item
+                    // Si la categoría cambió, debemos mover el producto de una categoría a otra.
                     if (cat.category !== productData.category) {
-                        cat.items.splice(itemIndex, 1); // Remover del viejo
-                        addProduct(productData); // Añadir al nuevo (o existente)
+                        cat.items.splice(itemIndex, 1); // Remover del array de la categoría vieja.
+                        addProduct(productData); // Añadir al array de la categoría nueva (o existente).
                     } else {
-                        cat.items[itemIndex] = productData;
+                        // Si la categoría no cambió, simplemente actualizamos el producto en su lugar.
+                        cat.items[itemIndex] = { ...cat.items[itemIndex], ...productData };
                     }
+                    foundAndUpdated = true;
                 }
             });
-        } else { // Creando
-            productData.id = Date.now(); // ID único
+
+        } else { // Si no hay ID, estamos CREANDO un producto nuevo.
+            productData.id = Date.now(); // ID único basado en la fecha.
             addProduct(productData);
         }
         
@@ -109,12 +116,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Esta es la función clave que se activa al presionar "Editar".
+    // Rellena el formulario con los datos del producto seleccionado.
     function populateFormForEdit(id) {
         let itemToEdit;
+        let categoryOfItem = '';
+        
         for (const category of menuData) {
             const foundItem = category.items.find(item => item.id === id);
             if (foundItem) {
-                itemToEdit = { ...foundItem, category: category.category };
+                itemToEdit = foundItem;
+                categoryOfItem = category.category;
                 break;
             }
         }
@@ -123,27 +135,31 @@ document.addEventListener('DOMContentLoaded', () => {
             formTitle.textContent = 'Editar Producto';
             productIdInput.value = itemToEdit.id;
             document.getElementById('product-name').value = itemToEdit.name;
-            document.getElementById('product-category').value = itemToEdit.category;
+            document.getElementById('product-category').value = categoryOfItem;
             document.getElementById('product-stock').value = itemToEdit.stock;
             document.getElementById('price-pocillo').value = itemToEdit.pocillo || '';
             document.getElementById('price-jarro').value = itemToEdit.jarro || '';
             document.getElementById('price-mediano').value = itemToEdit.mediano || '';
             document.getElementById('price-grande').value = itemToEdit.grande || '';
             cancelBtn.style.display = 'inline-block';
-            window.scrollTo(0, document.body.scrollHeight);
+            window.scrollTo(0, 0); // Llevar la vista al tope de la página para ver el formulario.
         }
     }
 
     function deleteProduct(id) {
         if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
         
+        let categoriesToDelete = [];
         menuData.forEach((cat, index) => {
             cat.items = cat.items.filter(item => item.id !== id);
-            // Si la categoría queda vacía, la eliminamos
             if (cat.items.length === 0) {
-                menuData.splice(index, 1);
+                categoriesToDelete.push(cat.category);
             }
         });
+
+        // Eliminar categorías que quedaron vacías
+        menuData = menuData.filter(cat => cat.items.length > 0);
+        
         saveMenu();
     }
 
