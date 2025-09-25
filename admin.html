@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración - Café del Día</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Panel de Administración</h1>
+        <nav>
+            <a href="index.html">Ir al Punto de Venta</a>
+        </nav>
+    </header>
+
+    <main class="admin-main">
+        <section class="admin-section card">
+            <h2>Gestión de Productos</h2>
+            <div id="menu-list-container">
+                </div>
+        </section>
+
+        <aside class="admin-section card">
+            <h2 id="form-title">Añadir Nuevo Producto</h2>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                
+                <div class="form-group">
+                    <label for="product-name">Nombre:</label>
+                    <input type="text" id="product-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-category">Categoría:</label>
+                    <input type="text" id="product-category" required list="category-list">
+                    <datalist id="category-list"></datalist>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-stock">Stock Inicial:</label>
+                    <input type="number" id="product-stock" value="99" required>
+                </div>
+
+                <fieldset>
+                    <legend>Precios por Tamaño</legend>
+                    <div class="form-group-inline">
+                        <label for="price-pocillo">Pocillo:</label>
+                        <input type="text" id="price-pocillo" placeholder="$2500">
+                    </div>
+                    <div class="form-group-inline">
+                        <label for="price-jarro">Jarro:</label>
+                        <input type="text" id="price-jarro" placeholder="$2900">
+                    </div>
+                    <div class="form-group-inline">
+                        <label for="price-mediano">Mediano/Único:</label>
+                        <input type="text" id="price-mediano" placeholder="$900">
+                    </div>
+                    <div class="form-group-inline">
+                        <label for="price-grande">Grande:</label>
+                        <input type="text" id="price-grande" placeholder="$3400">
+                    </div>
+                </fieldset>
+                
+                <div class="form-actions">
+                    <button type="submit" id="save-btn">Guardar Producto</button>
+                    <button type="button" id="cancel-btn" style="display: none;">Cancelar Edición</button>
+                </div>
+            </form>
+        </aside>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>
