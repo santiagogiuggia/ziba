@@ -1,53 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- SELECTORES DEL DOM ---
+    // --- SELECTORES DEL DOM (Sin cambios) ---
     const menuFiltersDiv = document.getElementById('menu-filters');
     const menuGridDiv = document.getElementById('menu-grid');
     const orderItemsList = document.getElementById('order-items-list');
-    const orderTotalEl = document.getElementById('order-total');
-    const processSaleBtn = document.getElementById('process-sale-btn');
-    const currentOrderIdEl = document.getElementById('current-order-id');
-    const updateNotification = document.getElementById('update-notification');
-    // Modales
-    const sizeModal = document.getElementById('size-modal');
-    const sizeModalProductName = document.getElementById('size-modal-product-name');
-    const sizeModalOptions = document.getElementById('size-modal-options');
-    const sizeModalCloseBtn = document.getElementById('size-modal-close');
-    const checkoutModal = document.getElementById('checkout-modal');
-    const checkoutTotalAmountEl = document.getElementById('checkout-total-amount');
-    const amountReceivedInput = document.getElementById('amount-received');
-    const checkoutChangeAmountEl = document.getElementById('checkout-change-amount');
-    const checkoutConfirmBtn = document.getElementById('checkout-confirm-btn');
-    const checkoutCancelBtn = document.getElementById('checkout-cancel-btn');
-    const holdOrderBtn = document.getElementById('hold-order-btn');
-    const viewHeldOrdersBtn = document.getElementById('view-held-orders-btn');
-    const heldOrdersModal = document.getElementById('held-orders-modal');
-    const heldOrdersList = document.getElementById('held-orders-list');
-    const heldOrdersCloseBtn = document.getElementById('held-orders-close-btn');
+    // ... y todos los demás ...
 
-    // --- ESTADO DE LA APLICACIÓN ---
+    // --- ESTADO DE LA APLICACIÓN (Sin cambios) ---
     let currentOrder = [];
     let heldOrders = JSON.parse(localStorage.getItem('cafeHeldOrders')) || [];
     let salesCounter = parseInt(localStorage.getItem('salesCounter')) || 1;
     let menuData = [];
 
-    // --- FUNCIONES ---
+    // --- FUNCIONES CON DIAGNÓSTICO ---
 
     function initializeMenu() {
+        console.log("Iniciando sistema...");
         const menuInStorage = localStorage.getItem('cafeMenu');
         if (menuInStorage) {
             menuData = JSON.parse(menuInStorage);
+            console.log("Menú cargado desde localStorage.");
         } else {
-            const baseMenu = [ /* Tu menú completo va aquí. Asegúrate de que no esté vacío. */ ];
-            if (baseMenu.length > 0) {
-                baseMenu.forEach(cat => cat.items.forEach(item => item.stock = item.stock || 99));
-                localStorage.setItem('cafeMenu', JSON.stringify(baseMenu));
-                menuData = baseMenu;
-                console.log('Menú inicial creado y guardado en localStorage.');
-            }
+            console.error("ERROR: No se encontró el menú en localStorage. Por favor, asegúrate de que exista.");
         }
     }
 
     function renderMenuGrid() {
+        // ... (esta función se mantiene igual, ya que la grilla se ve bien) ...
         menuGridDiv.innerHTML = '';
         if (!menuData) return;
         menuData.forEach(category => {
@@ -71,45 +49,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function onProductClick(item) {
+        // RASTREADOR 1
+        console.log(`1. Clic detectado en producto: ${item.name} (Stock: ${item.stock})`);
+
         if (item.stock <= 0) {
+            console.warn("Acción detenida: El producto no tiene stock.");
             return;
         }
         const availableSizes = ['pocillo', 'jarro', 'mediano', 'grande'].filter(size => item[size]);
         if (availableSizes.length > 1) {
             openSizeModal(item, availableSizes);
-        } else {
+        } else if (availableSizes.length === 1) {
             addToOrder(item.name, availableSizes[0], parsePrice(item[availableSizes[0]]), item.id);
+        } else {
+            console.error("Error: El producto no tiene precios/tamaños definidos.", item);
         }
     }
 
-    function openSizeModal(item, sizes) {
-        sizeModalProductName.textContent = `Seleccionar tamaño para ${item.name}`;
-        sizeModalOptions.innerHTML = '';
-        sizes.forEach(size => {
-            const btn = document.createElement('button');
-            const price = item[size];
-            btn.textContent = `${size.charAt(0).toUpperCase() + size.slice(1)} - ${price}`;
-            btn.addEventListener('click', () => {
-                addToOrder(item.name, size, parsePrice(price), item.id);
-                closeSizeModal();
-            });
-            sizeModalOptions.appendChild(btn);
-        });
-        sizeModal.style.display = 'flex';
-    }
-
-    function closeSizeModal() {
-        sizeModal.style.display = 'none';
-    }
-
     function addToOrder(name, size, price, productId) {
+        // RASTREADOR 2
+        console.log(`2. Añadiendo al pedido: ${name} (${size}) - $${price}`);
+        
         const note = prompt(`Añadir nota para ${name} (opcional):`);
         currentOrder.push({ name, size, price, productId, note: note || null });
+        
         updateOrderSummary();
     }
 
     function updateOrderSummary() {
-        orderItemsList.innerHTML = '';
+        // RASTREADOR 3
+        console.log("3. Actualizando la lista visual del pedido.");
+        console.log("Estado actual del pedido:", currentOrder);
+
+        orderItemsList.innerHTML = ''; // Limpia la lista
+
         if (currentOrder.length === 0) {
             orderItemsList.innerHTML = '<li>Agrega productos al pedido.</li>';
         } else {
@@ -129,19 +102,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 orderItemsList.appendChild(li);
             });
         }
+        
         const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
         orderTotalEl.innerHTML = `<strong>Total: ${formatCurrency(total)}</strong>`;
-    }
-
-    function removeFromOrder(index) {
-        currentOrder.splice(index, 1);
-        updateOrderSummary();
+        
+        // RASTREADOR 4
+        console.log("4. Lista visual actualizada correctamente.");
     }
     
-    // ... (Aquí van el resto de tus funciones: processSale, printTicket, holdOrder, etc.)
+    // El resto de funciones (parsePrice, formatCurrency, processSale, etc.) se mantienen igual.
+    // Asegúrate de tener todas las funciones completas en tu archivo.
+    function parsePrice(priceString) { if (!priceString) return 0; return parseFloat(priceString.replace('$', '').replace(/\./g, '')); }
+    function formatCurrency(number) { return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(number); }
 
     // --- INICIALIZACIÓN ---
     initializeMenu();
     renderMenuGrid();
-    // ... (resto de la inicialización)
+    // ... (asegúrate de que todas las llamadas a funciones de inicialización estén aquí)
 });
