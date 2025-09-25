@@ -344,3 +344,60 @@ document.addEventListener('DOMContentLoaded', () => {
     updateOrderSummary();
     updateCurrentOrderId();
 });
+document.addEventListener('DOMContentLoaded', () => {
+    // --- SELECTORES (añadimos el notificador) ---
+    const updateNotification = document.getElementById('update-notification');
+    // ... y todos los demás selectores que ya teníamos ...
+
+    // --- (El resto de tu script.js se mantiene igual hasta la sección de Event Listeners) ---
+    
+    // --- EVENT LISTENERS ---
+    
+    // ... (los event listeners que ya teníamos: holdOrderBtn, viewHeldOrdersBtn, etc.) ...
+
+    /**
+     * NUEVO: Listener para sincronizar entre pestañas.
+     * Este código "escucha" si otra pestaña (como admin.html) modifica el localStorage.
+     */
+    window.addEventListener('storage', (event) => {
+        // Nos aseguramos de que el cambio fue en nuestro menú.
+        if (event.key === 'cafeMenu') {
+            console.log('Se detectó un cambio en el menú desde otra pestaña. Recargando...');
+            
+            // 1. Mostrar la notificación
+            showUpdateNotification();
+            
+            // 2. Recargar los datos del menú desde localStorage
+            initializeMenu();
+            
+            // 3. Volver a "dibujar" el grid de productos con los nuevos precios
+            renderMenuGrid();
+        }
+    });
+
+    // --- FUNCIONES UTILITARIAS (añadimos una nueva) ---
+
+    // NUEVO: Función para mostrar y ocultar la notificación
+    function showUpdateNotification() {
+        updateNotification.classList.remove('hidden');
+        updateNotification.classList.add('show');
+        
+        // Ocultar la notificación después de 3 segundos
+        setTimeout(() => {
+            updateNotification.classList.remove('show');
+            // Usamos otro timeout para añadir la clase 'hidden' después de que la transición termine
+            setTimeout(() => {
+                updateNotification.classList.add('hidden');
+            }, 500); // 500ms es la duración de la transición
+        }, 3000);
+    }
+
+    // ... (el resto de funciones utilitarias y la inicialización se mantienen igual) ...
+
+    // --- INICIALIZACIÓN ---
+    initializeMenu(); 
+    renderMenuGrid();
+    renderCategoryFilters();
+    updateOrderSummary();
+    updateCurrentOrderId();
+});
