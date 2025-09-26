@@ -1,48 +1,22 @@
-/* --- Añade esto al final de style.css --- */
-
-/* Estilos para el Cierre de Caja */
-.daily-summary h2 {
-    text-align: center;
-    color: var(--primary-color);
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-.daily-products-sold {
-    margin-top: 30px;
-}
-
-.daily-products-sold h3 {
-    color: var(--secondary-color);
-}
-
-#daily-products-list {
-    list-style-type: none;
-    padding: 0;
-    column-count: 2; /* Muestra la lista en dos columnas si hay espacio */
-    column-gap: 20px;
-}
-
-#daily-products-list li {
-    padding: 5px 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
-/* Contenedor de Gráficos */
-.charts-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.chart-wrapper {
-    flex: 1;
-    min-width: 300px;
-    height: 400px;
-    position: relative;
-}
-
-canvas {
-    max-height: 100%;
-}
+#reports-main { flex-direction: column; gap: 20px; width: 100%; overflow-y: auto; }
+.report-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.summary-card { text-align: center; }
+.daily-summary h2 { text-align: center; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
+.daily-products-sold { margin-top: 30px; }
+.daily-products-sold h3 { color: var(--secondary-color); }
+#daily-products-list { list-style-type: none; padding: 0; column-count: 2; column-gap: 20px; }
+#daily-products-list li { padding: 5px 0; border-bottom: 1px solid var(--border-color); }
+.charts-container { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; }
+.chart-wrapper { flex: 1; min-width: 300px; height: 400px; position: relative; }
+canvas { width: 100% !important; height: 100% !important; }
+.report-filters { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+.report-table table { width: 100%; border-collapse: collapse; }
+.report-table th, .report-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+.report-table th { background-color: #f8f8f8; }
+.report-actions button.danger { background-color: var(--accent-color-danger); color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; }
+#held-orders-list { list-style-type: none; padding: 0; max-height: 300px; overflow-y: auto; }
+#held-orders-list li { padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: background-color 0.2s; display: flex; justify-content: space-between; align-items: center; }
+#held-orders-list li:hover { background-color: #f9f9f9; }
+#held-orders-list .held-order-info { font-weight: 600; }
+#held-orders-list .held-order-details { font-size: 0.9em; color: #555; }
+#held-orders-close-btn { width: 100%; padding: 12px; margin-top: 20px; border: none; border-radius: 8px; background-color: #777; color: white; cursor: pointer; }
