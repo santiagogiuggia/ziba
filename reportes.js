@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Selectores del DOM
     const dailyMetricsContainer = document.getElementById('daily-metrics');
     const dailyProductsList = document.getElementById('daily-products-list');
+    const weeklyReportTableBody = document.querySelector('#weekly-report-table tbody');
     const categoryRevenueChartCanvas = document.getElementById('categoryRevenueChart').getContext('2d');
     const topProductsChartCanvas = document.getElementById('topProductsChart').getContext('2d');
     const salesDetailTableBody = document.querySelector('#salesDetailTable tbody');
@@ -12,55 +13,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearDataBtn = document.getElementById('clearDataBtn');
     let categoryRevenueChart, topProductsChart;
 
+    function initializeReports() {
+        generateDailySummary();
+        generateDayOfWeekReport();
+        loadAndProcessSales();
+    }
+
     function getSalesFromStorage() {
-        const sales = JSON.parse(localStorage.getItem('cafeSales')) || [];
-        console.log("Ventas cargadas desde localStorage:", sales.length);
-        return sales;
+        return JSON.parse(localStorage.getItem('cafeSales')) || [];
     }
     
-    // =========================================================================
-    // VERSIÓN FINAL Y ROBUSTA DEL FILTRO DE FECHAS
-    // =========================================================================
     function filterSalesByDate(sales, startDateStr, endDateStr) {
-        console.log(`Iniciando filtro. Desde: '${startDateStr}', Hasta: '${endDateStr}'`);
-        
-        if (!startDateStr && !endDateStr) {
-            console.log("Filtros de fecha vacíos. Devolviendo todas las ventas.");
-            return sales;
-        }
-
-        // Para filtrar un solo día, si la fecha de fin está vacía, usamos la de inicio.
+        if (!startDateStr && !endDateStr) { return sales; }
         const effectiveEndDateStr = endDateStr || startDateStr;
-
-        const filtered = sales.filter(sale => {
-            const saleDateStr = sale.date.slice(0, 10); // Extraemos 'YYYY-MM-DD' de la venta
-            
-            // Comparamos los strings directamente, es el método más seguro contra zonas horarias.
+        return sales.filter(sale => {
+            const saleDateStr = sale.date.slice(0, 10);
             const isAfterStart = startDateStr ? saleDateStr >= startDateStr : true;
             const isBeforeEnd = effectiveEndDateStr ? saleDateStr <= effectiveEndDateStr : true;
-            
             return isAfterStart && isBeforeEnd;
         });
-
-        console.log(`Filtro completado. Se encontraron ${filtered.length} ventas.`);
-        return filtered;
     }
 
     function generateDailySummary() {
-        console.log("Generando resumen del día...");
         const allSales = getSalesFromStorage();
         const today = new Date().toISOString().slice(0, 10);
-        
-        const todaySales = filterSalesByDate(allSales, today, null); // Usamos null para que tome solo el día de hoy
+        const todaySales = filterSalesByDate(allSales, today, null);
 
         if (todaySales.length > 0) {
             const totalRevenue = todaySales.reduce((sum, sale) => sum + sale.total, 0);
             const totalTickets = todaySales.length;
             const averageTicket = totalTickets > 0 ? totalRevenue / totalTickets : 0;
-            dailyMetricsContainer.innerHTML = `
-                <div class="summary-card card"><h3>Ventas de Hoy</h3><p>${formatCurrency(totalRevenue)}</p></div>
-                <div class="summary-card card"><h3>N° de Tickets Hoy</h3><p>${totalTickets}</p></div>
-                <div class="summary-card card"><h3>Ticket Promedio Hoy</h3><p>${formatCurrency(averageTicket)}</p></div>`;
+            dailyMetricsContainer.innerHTML = `<div class="summary-card card"><h3>Ventas de Hoy</h3><p>${formatCurrency(totalRevenue)}</p></div><div class="summary-card card"><h3>N° de Tickets Hoy</h3><p>${totalTickets}</p></div><div class="summary-card card"><h3>Ticket Promedio Hoy</h3><p>${formatCurrency(averageTicket)}</p></div>`;
         } else {
             dailyMetricsContainer.innerHTML = '<p>No se han registrado ventas hoy.</p>';
         }
@@ -83,11 +66,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function generateDayOfWeekReport() {
+        const allSales = getSalesFromStorage();
+        const productCounts = {};
+        allSales.forEach(sale => {
+            const saleDate = new Date(sale.date);
+            const dayOfWeek = saleDate.getDay();
+            sale.items.forEach(item => {
+                const productName = `${item.name} (${item.size})`;
+                if (!productCounts[productName]) {
+                    productCounts[productName] = [0, 0, 0, 0, 0, 0, 0];
+                }
+                productCounts[productName][dayOfWeek]++;
+            });
+        });
+        weeklyReportTableBody.innerHTML = '';
+        if (Object.keys(productCounts).length === 0) {
+            weeklyReportTableBody.innerHTML = '<tr><td colspan="8">No hay suficientes datos de ventas para generar este reporte.</td></tr>';
+            return;
+        }
+        for (const productName in productCounts) {
+            const counts = productCounts[productName];
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${productName}</td><td>${counts[0]}</td><td>${counts[1]}</td><td>${counts[2]}</td><td>${counts[3]}</td><td>${counts[4]}</td><td>${counts[5]}</td><td>${counts[6]}</td>`;
+            weeklyReportTableBody.appendChild(row);
+        }
+    }
+
     function loadAndProcessSales() {
-        console.log("Cargando reportes históricos...");
         const allSales = getSalesFromStorage();
         const filteredSales = filterSalesByDate(allSales, startDateInput.value, endDateInput.value);
-        
         if (filteredSales.length === 0) {
             renderEmptyState();
             return;
@@ -98,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderEmptyState() {
-        console.log("Renderizando estado vacío para reportes históricos.");
         salesDetailTableBody.innerHTML = '<tr><td colspan="4">No hay ventas para mostrar en este período.</td></tr>';
         if (topProductsChart) topProductsChart.destroy();
         if (categoryRevenueChart) categoryRevenueChart.destroy();
@@ -106,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateSalesTable(sales) {
         salesDetailTableBody.innerHTML = '';
+        sales.sort((a, b) => new Date(b.date) - new Date(a.date));
         sales.forEach(sale => {
             const row = document.createElement('tr');
             row.innerHTML = `<td>${sale.id}</td><td>${new Date(sale.date).toLocaleString('es-AR')}</td><td>${sale.items.length}</td><td>${formatCurrency(sale.total)}</td>`;
@@ -161,12 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
     clearDataBtn.addEventListener('click', () => {
         if (confirm('¿ESTÁS SEGURO?')) {
             localStorage.removeItem('cafeSales');
-            generateDailySummary();
-            loadAndProcessSales();
+            initializeReports();
         }
     });
 
     // --- INICIALIZACIÓN ---
-    generateDailySummary();
-    loadAndProcessSales();
+    initializeReports();
 });
