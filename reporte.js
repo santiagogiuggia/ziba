@@ -13,43 +13,45 @@ document.addEventListener('DOMContentLoaded', () => {
     let categoryRevenueChart, topProductsChart;
 
     function getSalesFromStorage() {
-        return JSON.parse(localStorage.getItem('cafeSales')) || [];
+        const sales = JSON.parse(localStorage.getItem('cafeSales')) || [];
+        console.log("Ventas cargadas desde localStorage:", sales.length);
+        return sales;
     }
     
     // =========================================================================
-    // FUNCIÓN CORREGIDA PARA EL FILTRADO DE FECHAS
+    // VERSIÓN FINAL Y ROBUSTA DEL FILTRO DE FECHAS
     // =========================================================================
-    function filterSalesByDate(sales, startDate, endDate) {
-        if (!startDate && !endDate) {
+    function filterSalesByDate(sales, startDateStr, endDateStr) {
+        console.log(`Iniciando filtro. Desde: '${startDateStr}', Hasta: '${endDateStr}'`);
+        
+        if (!startDateStr && !endDateStr) {
+            console.log("Filtros de fecha vacíos. Devolviendo todas las ventas.");
             return sales;
         }
-        // Si solo hay fecha de inicio, la fecha de fin es la misma (para filtrar un solo día)
-        const effectiveEndDate = endDate || startDate;
 
-        return sales.filter(sale => {
-            // Extraemos solo la parte de la fecha (YYYY-MM-DD) del string guardado
-            const saleDate = sale.date.slice(0, 10);
+        // Para filtrar un solo día, si la fecha de fin está vacía, usamos la de inicio.
+        const effectiveEndDateStr = endDateStr || startDateStr;
+
+        const filtered = sales.filter(sale => {
+            const saleDateStr = sale.date.slice(0, 10); // Extraemos 'YYYY-MM-DD' de la venta
             
-            // Comparamos directamente los strings de fecha
-            if (startDate && saleDate < startDate) {
-                return false;
-            }
-            if (effectiveEndDate && saleDate > effectiveEndDate) {
-                return false;
-            }
-            return true;
+            // Comparamos los strings directamente, es el método más seguro contra zonas horarias.
+            const isAfterStart = startDateStr ? saleDateStr >= startDateStr : true;
+            const isBeforeEnd = effectiveEndDateStr ? saleDateStr <= effectiveEndDateStr : true;
+            
+            return isAfterStart && isBeforeEnd;
         });
+
+        console.log(`Filtro completado. Se encontraron ${filtered.length} ventas.`);
+        return filtered;
     }
 
     function generateDailySummary() {
+        console.log("Generando resumen del día...");
         const allSales = getSalesFromStorage();
         const today = new Date().toISOString().slice(0, 10);
         
-        // Ponemos la fecha de hoy en los filtros por defecto
-        startDateInput.value = today;
-        endDateInput.value = today;
-
-        const todaySales = filterSalesByDate(allSales, today, today);
+        const todaySales = filterSalesByDate(allSales, today, null); // Usamos null para que tome solo el día de hoy
 
         if (todaySales.length > 0) {
             const totalRevenue = todaySales.reduce((sum, sale) => sum + sale.total, 0);
@@ -82,33 +84,70 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadAndProcessSales() {
+        console.log("Cargando reportes históricos...");
         const allSales = getSalesFromStorage();
         const filteredSales = filterSalesByDate(allSales, startDateInput.value, endDateInput.value);
+        
         if (filteredSales.length === 0) {
             renderEmptyState();
             return;
         }
-        updateSummaryCards(filteredSales);
         populateSalesTable(filteredSales);
         renderTopProductsChart(filteredSales);
         renderCategoryRevenueChart(filteredSales);
     }
     
     function renderEmptyState() {
-        // ... (código para mostrar estado vacío)
+        console.log("Renderizando estado vacío para reportes históricos.");
+        salesDetailTableBody.innerHTML = '<tr><td colspan="4">No hay ventas para mostrar en este período.</td></tr>';
+        if (topProductsChart) topProductsChart.destroy();
+        if (categoryRevenueChart) categoryRevenueChart.destroy();
     }
-    function updateSummaryCards(sales) {
-        // ... (código para actualizar tarjetas de resumen histórico)
-    }
+
     function populateSalesTable(sales) {
-        // ... (código para llenar la tabla)
+        salesDetailTableBody.innerHTML = '';
+        sales.forEach(sale => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${sale.id}</td><td>${new Date(sale.date).toLocaleString('es-AR')}</td><td>${sale.items.length}</td><td>${formatCurrency(sale.total)}</td>`;
+            salesDetailTableBody.appendChild(row);
+        });
     }
+
     function renderTopProductsChart(sales) {
-        // ... (código para el gráfico de productos)
+        const productCounts = sales.flatMap(sale => sale.items).reduce((acc, item) => {
+            const key = `${item.name} (${item.size})`;
+            acc[key] = (acc[key] || 0) + 1;
+            return acc;
+        }, {});
+        const sortedProducts = Object.entries(productCounts).sort(([, a], [, b]) => b - a).slice(0, 10);
+        if (topProductsChart) topProductsChart.destroy();
+        topProductsChart = new Chart(topProductsChartCanvas, {
+            type: 'bar', data: { labels: sortedProducts.map(e => e[0]), datasets: [{ label: 'Cantidad Vendida', data: sortedProducts.map(e => e[1]), backgroundColor: 'rgba(111, 78, 55, 0.8)' }] },
+            options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+        });
     }
+
     function renderCategoryRevenueChart(sales) {
-        // ... (código para el gráfico de categorías)
+        const menuData = JSON.parse(localStorage.getItem('cafeMenu')) || [];
+        const revenueByCategory = {};
+        menuData.forEach(cat => { revenueByCategory[cat.category] = 0; });
+        sales.flatMap(sale => sale.items).forEach(itemSold => {
+            let categoryName = 'Desconocido';
+            for (const category of menuData) {
+                if (category.items.some(menuItem => menuItem.name === itemSold.name)) {
+                    categoryName = category.category;
+                    break;
+                }
+            }
+            revenueByCategory[categoryName] += itemSold.price;
+        });
+        if (categoryRevenueChart) categoryRevenueChart.destroy();
+        categoryRevenueChart = new Chart(categoryRevenueChartCanvas, {
+            type: 'doughnut', data: { labels: Object.keys(revenueByCategory), datasets: [{ data: Object.values(revenueByCategory), backgroundColor: ['#6F4E37', '#A0522D', '#C4A484', '#D2B48C', '#E3C16F', '#B5651D', '#8B4513'] }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
     }
+
     function formatCurrency(number) {
         return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(number);
     }
@@ -116,12 +155,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- EVENT LISTENERS ---
     filterBtn.addEventListener('click', loadAndProcessSales);
     resetBtn.addEventListener('click', () => {
-        startDateInput.value = '';
-        endDateInput.value = '';
+        startDateInput.value = ''; endDateInput.value = '';
         loadAndProcessSales();
     });
     clearDataBtn.addEventListener('click', () => {
-        if (confirm('¿ESTÁS SEGURO? Esta acción borrará permanentemente todo el historial de ventas.')) {
+        if (confirm('¿ESTÁS SEGURO?')) {
             localStorage.removeItem('cafeSales');
             generateDailySummary();
             loadAndProcessSales();
