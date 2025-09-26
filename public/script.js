@@ -24,64 +24,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const heldOrdersCloseBtn = document.getElementById('held-orders-close-btn');
 
     // --- ESTADO DE LA APLICACIÓN ---
-    let currentOrder = [];
-    let heldOrders = JSON.parse(localStorage.getItem('cafeHeldOrders')) || [];
-    let salesCounter = parseInt(localStorage.getItem('salesCounter')) || 1;
     let menuData = [];
-
+    let currentOrder = [];
+    let salesCounter = parseInt(localStorage.getItem('salesCounter')) || 1;
+    let heldOrders = JSON.parse(localStorage.getItem('cafeHeldOrders')) || [];
+    
     // --- FUNCIONES ---
-    function initializeMenu() {
-        const menuInStorage = localStorage.getItem('cafeMenu');
-        if (menuInStorage) {
-            menuData = JSON.parse(menuInStorage);
-        } else {
-            const baseMenu = [
-                {
-                    category: 'CAFÉ',
-                    items: [
-                        { id: 1, name: 'Espresso', pocillo: '$2.900', jarro: '$3.200' }, { id: 2, name: 'Doppio', pocillo: '$3.200', jarro: '$3.600' }, { id: 3, name: 'Americano', jarro: '$3.200', mediano: '$2.800', grande: '$3.000' }, { id: 4, name: 'Long Black', jarro: '$3.200', grande: '$3.200' }
-                    ]
-                },
-                {
-                    category: 'CAFÉ MÁS LECHE',
-                    items: [
-                        { id: 5, name: 'Espresso Macchiato', pocillo: '$2.100' }, { id: 6, name: 'Cortado', pocillo: '$2.700', jarro: '$2.900', mediano: '$3.100', grande: '$3.400' }, { id: 7, name: 'Flat White', jarro: '$3.300', mediano: '$3.600' }, { id: 8, name: 'Latte', jarro: '$3.000', mediano: '$3.200' }, { id: 9, name: 'Capuccino', jarro: '$3.100', mediano: '$3.300' }, { id: 10, name: 'Latte Saborizado', jarro: '$3.300', mediano: '$3.600' }
-                    ]
-                },
-                {
-                    category: 'BEBIDAS FRIAS',
-                    items: [
-                        { id: 11, name: 'Café Americano Frío', mediano: '$3.100' }, { id: 12, name: 'Latte Frío', mediano: '$3.400' }, { id: 13, name: 'Latte Saborizado Frío', mediano: '$3.700' }, { id: 14, name: 'Licuado de Banana', mediano: '$3.400' }, { id: 15, name: 'Licuado de Frutilla', mediano: '$3.800' }, { id: 16, name: 'Licuado de Durazno', mediano: '$3.500' }, { id: 17, name: 'Jugo de Naranja', mediano: '$2.800' }, { id: 18, name: 'Café Tonic', mediano: '$3.600' }, { id: 19, name: 'Café Tonic con Naranja', mediano: '$3.400' }
-                    ]
-                },
-                {
-                    category: 'PANADERÍA',
-                    items: [
-                        { id: 20, name: 'Medialuna', mediano: '$900' }, { id: 21, name: 'Criollo', mediano: '$600' }, { id: 22, name: 'Scon de Queso', mediano: '$1.400' }, { id: 23, name: 'Croissant', mediano: '$1.500' }, { id: 24, name: 'Croissant Bicolor', mediano: '$1.800' }, { id: 25, name: 'Croissant Jamón y Queso', mediano: '$2.700' }
-                    ]
-                },
-                {
-                    category: 'PASTELERÍA',
-                    items: [
-                        { id: 26, name: 'Budín Naranja y Choco', mediano: '$2.000' }, { id: 27, name: 'Budín Limón y Amapola', mediano: '$2.000' }, { id: 28, name: 'Brownie con Nuez', mediano: '$2.200' }, { id: 29, name: 'Alfajor de Fruta', mediano: '$1.800' }, { id: 30, name: 'Alfajor DDL Chocolate', mediano: '$2.000' }, { id: 31, name: 'Pasta Frola', mediano: '$2.200' }, { id: 32, name: 'Roll de Canela', mediano: '$2.200' }, { id: 33, name: 'Carrot Cake', mediano: '$2.500' }
-                    ]
-                },
-                {
-                    category: 'COMBOS',
-                    items: [
-                        { id: 34, name: 'Combo: 1 Medialuna + 1 Criollo', mediano: '$2.800', grande: '$3.200' }, { id: 35, name: 'Combo: 2 Medialunas', mediano: '$3.100', grande: '$3.500' }, { id: 36, name: 'Combo: Roll de Canela', mediano: '$3.800', grande: '$4.200' }, { id: 37, name: 'Combo: Croissant', mediano: '$3.400', grande: '$3.800' }
-                    ]
-                },
-                {
-                    category: 'EXTRAS',
-                    items: [
-                        { id: 38, name: 'Shot Extra de Café', mediano: '$400' }, { id: 39, name: 'Shot Extra de Syrup', mediano: '$400' }, { id: 40, name: 'Syrup (Vainilla, Caramelo, etc)', mediano: '$400' }
-                    ]
-                }
-            ];
-            baseMenu.forEach(cat => cat.items.forEach(item => item.stock = item.stock || 99));
-            localStorage.setItem('cafeMenu', JSON.stringify(baseMenu));
-            menuData = baseMenu;
+    async function initializeMenu() {
+        try {
+            console.log("Pidiendo menú al servidor...");
+            const response = await fetch('/api/menu');
+            if (!response.ok) {
+                throw new Error(`Error del servidor: ${response.statusText}`);
+            }
+            menuData = await response.json();
+            console.log("Menú cargado exitosamente desde el servidor.");
+        } catch (error) {
+            console.error("Error al inicializar el menú:", error);
+            if (menuGridDiv) {
+                menuGridDiv.innerHTML = "<p style='color: red; text-align: center; width: 100%;'>Error al cargar productos. Asegúrate de que el servidor esté funcionando ejecutando 'npm start' en la terminal.</p>";
+            }
         }
     }
 
@@ -231,7 +193,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function saveMenuData() { localStorage.setItem('cafeMenu', JSON.stringify(menuData)); }
-    function printTicket(sale) { /* Lógica de impresión */ }
+    
+    function printTicket(sale) {
+        const ticketWindow = window.open('', 'PRINT', 'height=600,width=400');
+        ticketWindow.document.write('<html><head><title>Comanda</title>');
+        ticketWindow.document.write(`<style>body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 5px; font-size: 10pt; } h2, h3 { text-align: center; margin: 5px 0; } p { margin: 2px 0; } table { width: 100%; border-collapse: collapse; } th, td { padding: 2px 0; } .item-line td:first-child { text-align: left; } .item-line td:last-child { text-align: right; } .total-line { border-top: 1px dashed black; font-weight: bold; } hr { border: none; border-top: 1px dashed black; }</style>`);
+        ticketWindow.document.write('</head><body>');
+        ticketWindow.document.write('<h2>Café del Día</h2>');
+        ticketWindow.document.write(`<h3>Comanda N°: ${sale.id}</h3>`);
+        ticketWindow.document.write(`<p>Fecha: ${new Date(sale.date).toLocaleString('es-AR')}</p>`);
+        ticketWindow.document.write('<hr>');
+        ticketWindow.document.write('<table>');
+        sale.items.forEach(item => {
+            ticketWindow.document.write(`<tr class="item-line"><td>${item.name} (${item.size})</td><td>${formatCurrency(item.price)}</td></tr>`);
+            if (item.note) { ticketWindow.document.write(`<tr class="item-line"><td colspan="2" style="font-style:italic;padding-left:10px;">Nota: ${item.note}</td></tr>`);}
+        });
+        ticketWindow.document.write('</table><hr>');
+        ticketWindow.document.write(`<table><tr class="total-line"><td>TOTAL:</td><td>${formatCurrency(sale.total)}</td></tr></table>`);
+        ticketWindow.document.write('</body></html>');
+        ticketWindow.document.close();
+        ticketWindow.focus();
+        ticketWindow.print();
+        ticketWindow.close();
+    }
+    
     function startCheckout() {
         if (currentOrder.length === 0) { alert('El pedido está vacío.'); return; }
         const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
@@ -298,55 +283,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENT LISTENERS ---
     orderItemsList.addEventListener('click', (e) => { if (e.target.classList.contains('remove-item-btn')) { removeFromOrder(e.target.dataset.index); } });
-    if(processSaleBtn) processSaleBtn.addEventListener('click', startCheckout);
-    if(checkoutConfirmBtn) checkoutConfirmBtn.addEventListener('click', processSale);
-    if(checkoutCancelBtn) checkoutCancelBtn.addEventListener('click', closeCheckoutModal);
-    if(amountReceivedInput) amountReceivedInput.addEventListener('input', updateChange);
-    if(sizeModalCloseBtn) sizeModalCloseBtn.addEventListener('click', closeSizeModal);
-    if(holdOrderBtn) holdOrderBtn.addEventListener('click', holdOrder);
-    if(viewHeldOrdersBtn) viewHeldOrdersBtn.addEventListener('click', showHeldOrdersModal);
-    if(heldOrdersCloseBtn) heldOrdersCloseBtn.addEventListener('click', closeHeldOrdersModal);
-    if(heldOrdersList) heldOrdersList.addEventListener('click', (e) => { if (e.target.classList.contains('recall-btn')) { recallOrder(parseInt(e.target.closest('li').dataset.orderId)); } });
+    processSaleBtn.addEventListener('click', startCheckout);
+    checkoutConfirmBtn.addEventListener('click', processSale);
+    checkoutCancelBtn.addEventListener('click', closeCheckoutModal);
+    amountReceivedInput.addEventListener('input', updateChange);
+    sizeModalCloseBtn.addEventListener('click', closeSizeModal);
+    holdOrderBtn.addEventListener('click', holdOrder);
+    viewHeldOrdersBtn.addEventListener('click', showHeldOrdersModal);
+    heldOrdersCloseBtn.addEventListener('click', closeHeldOrdersModal);
+    heldOrdersList.addEventListener('click', (e) => { if (e.target.classList.contains('recall-btn')) { recallOrder(parseInt(e.target.closest('li').dataset.orderId)); } });
     window.addEventListener('storage', (event) => { if (event.key === 'cafeMenu') { showUpdateNotification(); initializeMenu(); renderMenuGrid(); } });
-document.addEventListener('DOMContentLoaded', () => {
-    // ... (Todos tus selectores se mantienen igual) ...
-
-    let currentOrder = [];
-    let salesCounter = parseInt(localStorage.getItem('salesCounter')) || 1; // Las ventas pueden seguir en localStorage por ahora
-    let menuData = [];
-
-    // ==================================================================
-    // FUNCIÓN initializeMenu MODIFICADA PARA USAR EL BACKEND
-    // ==================================================================
-    async function initializeMenu() {
-        try {
-            // Hacemos una petición a nuestro servidor para obtener el menú
-            const response = await fetch('/api/menu');
-            if (!response.ok) {
-                throw new Error('No se pudo cargar el menú desde el servidor.');
-            }
-            // Convertimos la respuesta a JSON y la guardamos en nuestra variable
-            menuData = await response.json();
-            console.log("Menú cargado exitosamente desde el servidor.");
-        } catch (error) {
-            console.error("Error al inicializar el menú:", error);
-            // Aquí podríamos mostrar un mensaje de error en la pantalla
-            menuGridDiv.innerHTML = "<p>Error al cargar productos. Asegúrate de que el servidor esté funcionando.</p>";
-        }
-    }
-
-    // El resto de tus funciones (renderMenuGrid, onProductClick, etc.)
-    // se mantienen exactamente igual, ya que siguen trabajando con la variable `menuData`.
 
     // --- INICIALIZACIÓN ---
-    // Usamos async/await aquí para asegurarnos de que el menú se carga ANTES de intentar dibujarlo
     async function start() {
-        await initializeMenu(); // Espera a que el menú se cargue
+        await initializeMenu();
         renderMenuGrid();
         renderCategoryFilters();
         updateOrderSummary();
         updateCurrentOrderId();
     }
+    start();
 
-    start(); // Ejecutamos la nueva función de inicio
-});
+}); // <-- ESTA LLAVE Y PARÉNTESIS FINAL ES LA QUE PROBABLEMENTE FALTABA
