@@ -316,3 +316,48 @@ document.addEventListener('DOMContentLoaded', () => {
     updateOrderSummary();
     updateCurrentOrderId();
 });
+
+// En /public/script.js
+
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (Todos tus selectores se mantienen igual) ...
+
+    let currentOrder = [];
+    let salesCounter = parseInt(localStorage.getItem('salesCounter')) || 1; // Las ventas pueden seguir en localStorage por ahora
+    let menuData = [];
+
+    // ==================================================================
+    // FUNCIÓN initializeMenu MODIFICADA PARA USAR EL BACKEND
+    // ==================================================================
+    async function initializeMenu() {
+        try {
+            // Hacemos una petición a nuestro servidor para obtener el menú
+            const response = await fetch('/api/menu');
+            if (!response.ok) {
+                throw new Error('No se pudo cargar el menú desde el servidor.');
+            }
+            // Convertimos la respuesta a JSON y la guardamos en nuestra variable
+            menuData = await response.json();
+            console.log("Menú cargado exitosamente desde el servidor.");
+        } catch (error) {
+            console.error("Error al inicializar el menú:", error);
+            // Aquí podríamos mostrar un mensaje de error en la pantalla
+            menuGridDiv.innerHTML = "<p>Error al cargar productos. Asegúrate de que el servidor esté funcionando.</p>";
+        }
+    }
+
+    // El resto de tus funciones (renderMenuGrid, onProductClick, etc.)
+    // se mantienen exactamente igual, ya que siguen trabajando con la variable `menuData`.
+
+    // --- INICIALIZACIÓN ---
+    // Usamos async/await aquí para asegurarnos de que el menú se carga ANTES de intentar dibujarlo
+    async function start() {
+        await initializeMenu(); // Espera a que el menú se cargue
+        renderMenuGrid();
+        renderCategoryFilters();
+        updateOrderSummary();
+        updateCurrentOrderId();
+    }
+
+    start(); // Ejecutamos la nueva función de inicio
+});
