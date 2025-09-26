@@ -39,13 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     category: 'CAFÉ',
                     items: [
-                        { id: 1, name: 'Espresso', pocillo: '$2.500', jarro: '$2.900' }, { id: 2, name: 'Doppio', pocillo: '$2.700', jarro: '$3.200' }, { id: 3, name: 'Americano', jarro: '$3.000', mediano: '$2.800', grande: '$3.000' }, { id: 4, name: 'Long Black', jarro: '$3.200', grande: '$3.000' }
+                        { id: 1, name: 'Espresso', pocillo: '$2.900', jarro: '$3.200' }, { id: 2, name: 'Doppio', pocillo: '$3.200', jarro: '$3.600' }, { id: 3, name: 'Americano', jarro: '$3.200', mediano: '$2.800', grande: '$3.000' }, { id: 4, name: 'Long Black', jarro: '$3.200', grande: '$3.200' }
                     ]
                 },
                 {
                     category: 'CAFÉ MÁS LECHE',
                     items: [
-                        { id: 5, name: 'Espresso Macchiato', pocillo: '$2.100' }, { id: 6, name: 'Cortado', pocillo: '$2.700', jarro: '$2.900', mediano: '$3.100', grande: '$3.400' }, { id: 7, name: 'Flat White', jarro: '$3.300', mediano: '$3.600' }, { id: 8, name: 'Latte / Latte Macchiato', jarro: '$3.000', mediano: '$3.200' }, { id: 9, name: 'Capuccino', jarro: '$3.100', mediano: '$3.300' }, { id: 10, name: 'Latte Saborizado', jarro: '$3.300', mediano: '$3.600' }
+                        { id: 5, name: 'Espresso Macchiato', pocillo: '$2.100' }, { id: 6, name: 'Cortado', pocillo: '$2.700', jarro: '$2.900', mediano: '$3.100', grande: '$3.400' }, { id: 7, name: 'Flat White', jarro: '$3.300', mediano: '$3.600' }, { id: 8, name: 'Latte', jarro: '$3.000', mediano: '$3.200' }, { id: 9, name: 'Capuccino', jarro: '$3.100', mediano: '$3.300' }, { id: 10, name: 'Latte Saborizado', jarro: '$3.300', mediano: '$3.600' }
                     ]
                 },
                 {
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateOrderSummary() {
-        if (!orderItemsList) return;
+        if (!orderItemsList || !orderTotalEl) return;
         orderItemsList.innerHTML = '';
         if (currentOrder.length === 0) {
             orderItemsList.innerHTML = '<li>Agrega productos al pedido.</li>';
@@ -229,20 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
         closeCheckoutModal();
         renderMenuGrid();
     }
-
-    function saveMenuData() {
-        localStorage.setItem('cafeMenu', JSON.stringify(menuData));
-    }
-
-    function printTicket(sale) {
-        // ... (Tu código de impresión)
-    }
-
+    
+    function saveMenuData() { localStorage.setItem('cafeMenu', JSON.stringify(menuData)); }
+    function printTicket(sale) { /* Lógica de impresión */ }
     function startCheckout() {
-        if (currentOrder.length === 0) {
-            alert('El pedido está vacío.');
-            return;
-        }
+        if (currentOrder.length === 0) { alert('El pedido está vacío.'); return; }
         const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
         checkoutTotalAmountEl.textContent = formatCurrency(total);
         amountReceivedInput.value = '';
@@ -250,9 +241,78 @@ document.addEventListener('DOMContentLoaded', () => {
         checkoutModal.style.display = 'flex';
         amountReceivedInput.focus();
     }
-    
-    // ... (El resto de las funciones: closeCheckoutModal, updateChange, holdOrder, etc.)
+    function closeCheckoutModal() { checkoutModal.style.display = 'none'; }
+    function updateChange() {
+        const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
+        const received = parseFloat(amountReceivedInput.value) || 0;
+        const change = received - total;
+        checkoutChangeAmountEl.textContent = formatCurrency(change < 0 ? 0 : change);
+    }
+    function holdOrder() {
+        if (currentOrder.length === 0) { alert('No hay ningún producto para guardar.'); return; }
+        const heldOrder = { id: Date.now(), time: new Date().toLocaleTimeString('es-AR'), items: currentOrder };
+        heldOrders.push(heldOrder);
+        localStorage.setItem('cafeHeldOrders', JSON.stringify(heldOrders));
+        alert(`Pedido guardado a las ${heldOrder.time}.`);
+        currentOrder = [];
+        updateOrderSummary();
+    }
+    function showHeldOrdersModal() {
+        heldOrdersList.innerHTML = '';
+        if (heldOrders.length === 0) {
+            heldOrdersList.innerHTML = '<li>No hay pedidos en espera.</li>';
+        } else {
+            heldOrders.forEach(order => {
+                const total = order.items.reduce((sum, item) => sum + item.price, 0);
+                const li = document.createElement('li');
+                li.dataset.orderId = order.id;
+                li.innerHTML = `<div><div class="held-order-info">Pedido de las ${order.time}</div><div class="held-order-details">${order.items.length} productos - ${formatCurrency(total)}</div></div><button class="recall-btn">Recuperar</button>`;
+                heldOrdersList.appendChild(li);
+            });
+        }
+        heldOrdersModal.style.display = 'flex';
+    }
+    function recallOrder(orderId) {
+        if (currentOrder.length > 0 && !confirm('Tienes un pedido activo. ¿Quieres descartarlo para recuperar el pedido guardado?')) { return; }
+        const orderIndex = heldOrders.findIndex(order => order.id === orderId);
+        if (orderIndex > -1) {
+            currentOrder = heldOrders[orderIndex].items;
+            heldOrders.splice(orderIndex, 1);
+            localStorage.setItem('cafeHeldOrders', JSON.stringify(heldOrders));
+            updateOrderSummary();
+            closeHeldOrdersModal();
+        }
+    }
+    function closeHeldOrdersModal() { heldOrdersModal.style.display = 'none'; }
+    function parsePrice(priceString) { if (!priceString) return 0; return parseFloat(String(priceString).replace('$', '').replace(/\./g, '')); }
+    function formatCurrency(number) { return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(number); }
+    function updateCurrentOrderId() { if (currentOrderIdEl) currentOrderIdEl.textContent = salesCounter; }
+    function showUpdateNotification() {
+        updateNotification.classList.remove('hidden');
+        updateNotification.classList.add('show');
+        setTimeout(() => {
+            updateNotification.classList.remove('show');
+            setTimeout(() => { updateNotification.classList.add('hidden'); }, 500);
+        }, 3000);
+    }
 
-    function parsePrice(priceString) {
-        if (!priceString) return 0;
-        return parseFloat(String(priceString).
+    // --- EVENT LISTENERS ---
+    orderItemsList.addEventListener('click', (e) => { if (e.target.classList.contains('remove-item-btn')) { removeFromOrder(e.target.dataset.index); } });
+    if(processSaleBtn) processSaleBtn.addEventListener('click', startCheckout);
+    if(checkoutConfirmBtn) checkoutConfirmBtn.addEventListener('click', processSale);
+    if(checkoutCancelBtn) checkoutCancelBtn.addEventListener('click', closeCheckoutModal);
+    if(amountReceivedInput) amountReceivedInput.addEventListener('input', updateChange);
+    if(sizeModalCloseBtn) sizeModalCloseBtn.addEventListener('click', closeSizeModal);
+    if(holdOrderBtn) holdOrderBtn.addEventListener('click', holdOrder);
+    if(viewHeldOrdersBtn) viewHeldOrdersBtn.addEventListener('click', showHeldOrdersModal);
+    if(heldOrdersCloseBtn) heldOrdersCloseBtn.addEventListener('click', closeHeldOrdersModal);
+    if(heldOrdersList) heldOrdersList.addEventListener('click', (e) => { if (e.target.classList.contains('recall-btn')) { recallOrder(parseInt(e.target.closest('li').dataset.orderId)); } });
+    window.addEventListener('storage', (event) => { if (event.key === 'cafeMenu') { showUpdateNotification(); initializeMenu(); renderMenuGrid(); } });
+
+    // --- INICIALIZACIÓN ---
+    initializeMenu();
+    renderMenuGrid();
+    renderCategoryFilters();
+    updateOrderSummary();
+    updateCurrentOrderId();
+});
