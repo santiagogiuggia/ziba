@@ -1,4 +1,3 @@
-// Reemplaza TODO el contenido de tu reportes.js
 document.addEventListener('DOMContentLoaded', () => {
     // Selectores del DOM
     const dailyMetricsContainer = document.getElementById('daily-metrics');
@@ -19,38 +18,38 @@ document.addEventListener('DOMContentLoaded', () => {
         loadAndProcessSales();
     }
 
-    // Función para generar el resumen del día
+    // ---- ESTA ES LA PARTE CLAVE PARA LEER LAS VENTAS ----
+    function getSalesFromStorage() {
+        return JSON.parse(localStorage.getItem('cafeSales')) || [];
+    }
+    // ----------------------------------------------------
+
     function generateDailySummary() {
-        const allSales = JSON.parse(localStorage.getItem('cafeSales')) || [];
-        const today = new Date().toISOString().slice(0, 10);
-        const todaySales = filterSalesByDate(allSales, today, today);
-
-        if (todaySales.length > 0) {
-            // ... (código para mostrar las métricas del día)
-        } else {
-            dailyMetricsContainer.innerHTML = '<p>No se han registrado ventas hoy.</p>';
-        }
-
-        // ... (código para mostrar la lista de productos vendidos hoy)
+        const allSales = getSalesFromStorage();
+        // ... (resto del código de resumen diario)
     }
 
-    // Función para cargar los reportes históricos
     function loadAndProcessSales() {
-        const allSales = JSON.parse(localStorage.getItem('cafeSales')) || [];
-        const filteredSales = filterSalesByDate(allSales, startDateInput.value, endDateInput.value);
-        
-        if (filteredSales.length === 0) {
-            renderEmptyState(); // Asegúrate de que esta función exista
-            return;
-        }
-
-        // ... (resto de la lógica para los reportes históricos)
-        renderTopProductsChart(filteredSales);
-        renderCategoryRevenueChart(filteredSales);
+        const allSales = getSalesFromStorage();
+        // ... (resto del código de reportes históricos)
     }
-    
+
     // (Asegúrate de tener todas tus funciones aquí: filterSalesByDate, renderTopProductsChart, etc.)
 
-    // Inicialización
+    // --- EVENT LISTENERS ---
+    filterBtn.addEventListener('click', loadAndProcessSales);
+    resetBtn.addEventListener('click', () => {
+        startDateInput.value = '';
+        endDateInput.value = '';
+        loadAndProcessSales();
+    });
+    clearDataBtn.addEventListener('click', () => {
+        if (confirm('¿ESTÁS SEGURO? Esta acción borrará permanentemente todo el historial de ventas.')) {
+            localStorage.removeItem('cafeSales');
+            initializeReports();
+        }
+    });
+
+    // --- INICIALIZACIÓN ---
     initializeReports();
 });
