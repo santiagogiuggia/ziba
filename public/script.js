@@ -308,17 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(heldOrdersCloseBtn) heldOrdersCloseBtn.addEventListener('click', closeHeldOrdersModal);
     if(heldOrdersList) heldOrdersList.addEventListener('click', (e) => { if (e.target.classList.contains('recall-btn')) { recallOrder(parseInt(e.target.closest('li').dataset.orderId)); } });
     window.addEventListener('storage', (event) => { if (event.key === 'cafeMenu') { showUpdateNotification(); initializeMenu(); renderMenuGrid(); } });
-
-    // --- INICIALIZACIÓN ---
-    initializeMenu();
-    renderMenuGrid();
-    renderCategoryFilters();
-    updateOrderSummary();
-    updateCurrentOrderId();
-});
-
-// En /public/script.js
-
 document.addEventListener('DOMContentLoaded', () => {
     // ... (Todos tus selectores se mantienen igual) ...
 
