@@ -31,12 +31,97 @@ document.addEventListener('DOMContentLoaded', () => {
     let menuData = [];
 
     // --- FUNCIONES ---
+
     function initializeMenu() {
         const menuInStorage = localStorage.getItem('cafeMenu');
         if (menuInStorage) {
             menuData = JSON.parse(menuInStorage);
         } else {
-            console.error("ERROR CRÍTICO: No se encontró el menú en localStorage. Abre index.html para que se cree.");
+            // ==================================================================
+            // ESTA ES LA LISTA MAESTRA DE PRODUCTOS. ES CRUCIAL QUE NO ESTÉ VACÍA
+            // ==================================================================
+            const baseMenu = [
+                {
+                    category: 'CAFÉ',
+                    items: [
+                        { id: 1, name: 'Espresso', pocillo: '$2.500', jarro: '$2.900' },
+                        { id: 2, name: 'Doppio', pocillo: '$2.700', jarro: '$3.200' },
+                        { id: 3, name: 'Americano', jarro: '$3.000', mediano: '$2.800', grande: '$3.000' },
+                        { id: 4, name: 'Long Black', jarro: '$3.200', grande: '$3.000' }
+                    ]
+                },
+                {
+                    category: 'CAFÉ MÁS LECHE',
+                    items: [
+                        { id: 5, name: 'Espresso Macchiato', pocillo: '$2.100' },
+                        { id: 6, name: 'Cortado', pocillo: '$2.700', jarro: '$2.900', mediano: '$3.100', grande: '$3.400' },
+                        { id: 7, name: 'Flat White', jarro: '$3.300', mediano: '$3.600' },
+                        { id: 8, name: 'Latte / Latte Macchiato', jarro: '$3.000', mediano: '$3.200' },
+                        { id: 9, name: 'Capuccino', jarro: '$3.100', mediano: '$3.300' },
+                        { id: 10, name: 'Latte Saborizado', jarro: '$3.300', mediano: '$3.600' }
+                    ]
+                },
+                {
+                    category: 'BEBIDAS FRIAS',
+                    items: [
+                        { id: 11, name: 'Café Americano Frío', mediano: '$3.100' },
+                        { id: 12, name: 'Latte Frío', mediano: '$3.400' },
+                        { id: 13, name: 'Latte Saborizado Frío', mediano: '$3.700' },
+                        { id: 14, name: 'Licuado de Banana', mediano: '$3.400' },
+                        { id: 15, name: 'Licuado de Frutilla', mediano: '$3.800' },
+                        { id: 16, name: 'Licuado de Durazno', mediano: '$3.500' },
+                        { id: 17, name: 'Jugo de Naranja', mediano: '$2.800' },
+                        { id: 18, name: 'Café Tonic', mediano: '$3.600' },
+                        { id: 19, name: 'Café Tonic con Naranja', mediano: '$3.400' }
+                    ]
+                },
+                {
+                    category: 'PANADERÍA',
+                    items: [
+                        { id: 20, name: 'Medialuna', mediano: '$900' },
+                        { id: 21, name: 'Criollo', mediano: '$600' },
+                        { id: 22, name: 'Scon de Queso', mediano: '$1.400' },
+                        { id: 23, name: 'Croissant', mediano: '$1.500' },
+                        { id: 24, name: 'Croissant Bicolor', mediano: '$1.800' },
+                        { id: 25, name: 'Croissant Jamón y Queso', mediano: '$2.700' }
+                    ]
+                },
+                {
+                    category: 'PASTELERÍA',
+                    items: [
+                        { id: 26, name: 'Budín Naranja y Choco', mediano: '$2.000' },
+                        { id: 27, name: 'Budín Limón y Amapola', mediano: '$2.000' },
+                        { id: 28, name: 'Brownie con Nuez', mediano: '$2.200' },
+                        { id: 29, name: 'Alfajor de Fruta', mediano: '$1.800' },
+                        { id: 30, name: 'Alfajor DDL Chocolate', mediano: '$2.000' },
+                        { id: 31, name: 'Pasta Frola', mediano: '$2.200' },
+                        { id: 32, name: 'Roll de Canela', mediano: '$2.200' },
+                        { id: 33, name: 'Carrot Cake', mediano: '$2.500' }
+                    ]
+                },
+                {
+                    category: 'COMBOS',
+                    items: [
+                        { id: 34, name: 'Combo: 1 Medialuna + 1 Criollo', mediano: '$2.800', grande: '$3.200' },
+                        { id: 35, name: 'Combo: 2 Medialunas', mediano: '$3.100', grande: '$3.500' },
+                        { id: 36, name: 'Combo: Roll de Canela', mediano: '$3.800', grande: '$4.200' },
+                        { id: 37, name: 'Combo: Croissant', mediano: '$3.400', grande: '$3.800' }
+                    ]
+                },
+                {
+                    category: 'EXTRAS',
+                    items: [
+                        { id: 38, name: 'Shot Extra de Café', mediano: '$400' },
+                        { id: 39, name: 'Shot Extra de Syrup', mediano: '$400' },
+                        { id: 40, name: 'Syrup (Vainilla, Caramelo, etc)', mediano: '$400' }
+                    ]
+                }
+            ];
+            
+            baseMenu.forEach(cat => cat.items.forEach(item => item.stock = item.stock || 99));
+            localStorage.setItem('cafeMenu', JSON.stringify(baseMenu));
+            menuData = baseMenu;
+            console.log('Menú inicial creado y guardado en localStorage.');
         }
     }
 
@@ -77,180 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
             menuFiltersDiv.appendChild(btn);
         });
     }
-
-    function filterMenu(category) {
-        document.querySelectorAll('#menu-filters button').forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`#menu-filters button[data-category="${category}"]`).classList.add('active');
-        document.querySelectorAll('.product-card').forEach(card => {
-            if (category === 'Todos' || card.dataset.category === category) {
-                card.classList.remove('hidden');
-            } else {
-                card.classList.add('hidden');
-            }
-        });
-    }
-
-    function onProductClick(item) {
-        if (item.stock <= 0) return;
-        const availableSizes = ['pocillo', 'jarro', 'mediano', 'grande'].filter(size => item[size]);
-        if (availableSizes.length > 1) {
-            openSizeModal(item, availableSizes);
-        } else if (availableSizes.length === 1) {
-            addToOrder(item.name, availableSizes[0], parsePrice(item[availableSizes[0]]), item.id);
-        }
-    }
-
-    function openSizeModal(item, sizes) {
-        sizeModalProductName.textContent = `Seleccionar tamaño para ${item.name}`;
-        sizeModalOptions.innerHTML = '';
-        sizes.forEach(size => {
-            const btn = document.createElement('button');
-            const price = item[size];
-            btn.textContent = `${size.charAt(0).toUpperCase() + size.slice(1)} - ${price}`;
-            btn.addEventListener('click', () => {
-                addToOrder(item.name, size, parsePrice(price), item.id);
-                closeSizeModal();
-            });
-            sizeModalOptions.appendChild(btn);
-        });
-        sizeModal.style.display = 'flex';
-    }
-
-    function closeSizeModal() {
-        sizeModal.style.display = 'none';
-    }
-
-    function addToOrder(name, size, price, productId) {
-        const note = prompt(`Añadir nota para ${name} (opcional):`);
-        currentOrder.push({ name, size, price, productId, note: note || null });
-        updateOrderSummary();
-    }
-
-    function updateOrderSummary() {
-        orderItemsList.innerHTML = '';
-        if (currentOrder.length === 0) {
-            orderItemsList.innerHTML = '<li>Agrega productos al pedido.</li>';
-        } else {
-            currentOrder.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = 'order-item';
-                const noteHtml = item.note ? `<span class="item-note">Nota: ${item.note}</span>` : '';
-                li.innerHTML = `
-                    <div>
-                        <span>${item.name} (${item.size})</span>
-                        ${noteHtml}
-                    </div>
-                    <div class="item-actions-container">
-                        <span class="item-price">${formatCurrency(item.price)}</span>
-                        <button data-index="${index}" class="remove-item-btn">X</button>
-                    </div>`;
-                orderItemsList.appendChild(li);
-            });
-        }
-        const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
-        orderTotalEl.innerHTML = `<strong>Total: ${formatCurrency(total)}</strong>`;
-    }
-
-    function removeFromOrder(index) {
-        currentOrder.splice(index, 1);
-        updateOrderSummary();
-    }
-
-    function processSale() {
-        if (currentOrder.length === 0) return;
-        const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
-        currentOrder.forEach(orderItem => {
-            for (const category of menuData) {
-                const product = category.items.find(p => p.id === orderItem.productId);
-                if (product) {
-                    product.stock -= 1;
-                    break;
-                }
-            }
-        });
-        saveMenuData();
-        const sale = { id: salesCounter, date: new Date().toISOString(), items: currentOrder, total: total };
-        const salesHistory = JSON.parse(localStorage.getItem('cafeSales')) || [];
-        salesHistory.push(sale);
-        localStorage.setItem('cafeSales', JSON.stringify(salesHistory));
-        salesCounter++;
-        localStorage.setItem('salesCounter', salesCounter);
-        printTicket(sale);
-        currentOrder = [];
-        updateOrderSummary();
-        updateCurrentOrderId();
-        closeCheckoutModal();
-        renderMenuGrid();
-    }
-
-    function saveMenuData() {
-        localStorage.setItem('cafeMenu', JSON.stringify(menuData));
-    }
-
-    function printTicket(sale) {
-        // ... (código de impresión sin cambios)
-    }
-
-    function startCheckout() {
-        if (currentOrder.length === 0) {
-            alert('El pedido está vacío.');
-            return;
-        }
-        const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
-        checkoutTotalAmountEl.textContent = formatCurrency(total);
-        amountReceivedInput.value = '';
-        checkoutChangeAmountEl.textContent = formatCurrency(0);
-        checkoutModal.style.display = 'flex';
-        amountReceivedInput.focus();
-    }
-
-    function closeCheckoutModal() {
-        checkoutModal.style.display = 'none';
-    }
-
-    function updateChange() {
-        const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
-        const received = parseFloat(amountReceivedInput.value) || 0;
-        const change = received - total;
-        checkoutChangeAmountEl.textContent = formatCurrency(change < 0 ? 0 : change);
-    }
     
-    function parsePrice(priceString) {
-        if (!priceString) return 0;
-        return parseFloat(String(priceString).replace('$', '').replace(/\./g, ''));
-    }
-
-    function formatCurrency(number) {
-        return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(number);
-    }
-
-    function updateCurrentOrderId() {
-        currentOrderIdEl.textContent = salesCounter;
-    }
-    
-    function showUpdateNotification() {
-        updateNotification.classList.remove('hidden');
-        updateNotification.classList.add('show');
-        setTimeout(() => {
-            updateNotification.classList.remove('show');
-            setTimeout(() => {
-                updateNotification.classList.add('hidden');
-            }, 500);
-        }, 3000);
-    }
-
-    // --- EVENT LISTENERS ---
-    processSaleBtn.addEventListener('click', startCheckout);
-    checkoutConfirmBtn.addEventListener('click', processSale);
-    // ... (resto de listeners)
-
-    window.addEventListener('storage', (event) => {
-        if (event.key === 'cafeMenu') {
-            showUpdateNotification();
-            initializeMenu();
-            renderMenuGrid();
-        }
-    });
+    // ... (El resto de tus funciones completas deben ir aquí: filterMenu, onProductClick, addToOrder, updateOrderSummary, etc.)
 
     // --- INICIALIZACIÓN ---
     initializeMenu();
