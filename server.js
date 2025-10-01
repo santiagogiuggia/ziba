@@ -26,8 +26,6 @@ function initializeDatabase() {
         db.run(`CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT NOT NULL, category TEXT NOT NULL, stock INTEGER NOT NULL, price_pocillo TEXT, price_jarro TEXT, price_mediano TEXT, price_grande TEXT)`);
         db.run(`CREATE TABLE IF NOT EXISTS sales (id INTEGER PRIMARY KEY, date TEXT NOT NULL, total REAL NOT NULL, items TEXT NOT NULL, payment_method TEXT, session_id INTEGER)`);
         db.run(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`);
-        db.run(`CREATE TABLE IF NOT EXISTS ingredients (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, stock REAL NOT NULL, unit TEXT NOT NULL)`);
-        db.run(`CREATE TABLE IF NOT EXISTS product_recipes (recipe_id INTEGER PRIMARY KEY AUTOINCREMENT, product_id INTEGER NOT NULL, ingredient_id INTEGER NOT NULL, quantity REAL NOT NULL)`);
         db.run(`CREATE TABLE IF NOT EXISTS caja_sesiones (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_apertura TEXT NOT NULL, monto_inicial REAL NOT NULL, cajero TEXT NOT NULL, barista TEXT, estado TEXT NOT NULL, fecha_cierre TEXT, monto_final_sistema REAL)`, (err) => {
             if (err) { return console.error("Error al crear tabla caja_sesiones:", err.message); }
             populateData();
