@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Café del Día - Punto de Venta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Café del Día - POS</h1>
+        <nav>
+            <a href="reportes.html">Ver Reportes</a>
+            <a href="admin.html">Administrar</a>
+            <button id="logout-btn">Cerrar Sesión</button>
+        </nav>
+    </header>
+
+    <div id="update-notification" class="hidden">
+        ¡El menú ha sido actualizado! Refrescando productos...
+    </div>
+
+    <main class="pos-main">
+        <section id="sale-interface">
+            <div id="menu-filters"></div>
+            <div id="menu-grid"></div>
+        </section>
+
+        <aside id="order-summary">
+            <h2>Pedido Actual</h2>
+            <div class="order-number">Pedido N°: <span id="current-order-id">--</span></div>
+            <ul id="order-items-list">
+                <li>Agrega productos al pedido.</li>
+            </ul>
+            <div id="order-total">
+                <strong>Total: $0</strong>
+            </div>
+            
+            <div class="order-actions">
+                <button id="hold-order-btn">Guardar Pedido</button>
+                <button id="view-held-orders-btn">Ver Guardados</button>
+            </div>
+
+            <button id="process-sale-btn">Cobrar y Comandar</button>
+        </aside>
+    </main>
+
+    <div id="size-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 id="size-modal-product-name"></h3>
+            <div id="size-modal-options"></div>
+            <button id="size-modal-close" class="cancel-btn">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="checkout-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Seleccionar Método de Pago</h3>
+            <div class="checkout-total">Total: <span id="checkout-total-amount"></span></div>
+            
+            <div class="payment-methods">
+                <button class="payment-btn" data-method="Efectivo">Efectivo</button>
+                <button class="payment-btn" data-method="Transferencia">Transferencia</button>
+                <button class="payment-btn mp-button" data-method="Mercado Pago">Mercado Pago</button>
+            </div>
+            
+            <div id="cash-payment" style="display: none;">
+                <hr>
+                <div class="checkout-input">
+                    <label for="amount-received">Dinero Recibido:</label>
+                    <input type="number" id="amount-received">
+                </div>
+                <div class="checkout-change">Vuelto: <span id="checkout-change-amount">$0</span></div>
+                <button id="checkout-confirm-cash-btn" class="confirm">Confirmar Venta</button>
+            </div>
+
+            <button id="checkout-cancel-btn" class="cancel-btn">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="held-orders-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Pedidos en Espera</h3>
+            <ul id="held-orders-list"></ul>
+            <button id="held-orders-close-btn" class="cancel-btn">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="text-align: center;">
+            <h3>Escanee para Pagar</h3>
+            <div id="qr-code-container">
+                </div>
+            <p>Total: <strong id="qr-total-amount"></strong></p>
+            <button id="qr-close-btn" class="cancel-btn">Cerrar</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 ZIBA Café. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs/qrcode.min.js"></script>
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

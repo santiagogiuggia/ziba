@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta y Punto de Venta - Zibá Café</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <header class="main-header">
+        <h1>Zibá Café - Punto de Venta</h1>
+        <nav>
+            <a href="#" id="cierre-caja">Cerrar Caja</a>
+            <button onclick="logout()">Cerrar Sesión</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="productos-area">
+            <h2>Nuestra Carta</h2>
+            <div id="contenedor-productos" class="grid-productos">
+                <p>Cargando la carta...</p>
+            </div>
+        </section>
+
+        <aside class="pedido-area">
+            <h2>Pedido Actual</h2>
+            <div id="contenedor-pedido">
+                <p>Aún no hay productos en el pedido.</p>
+            </div>
+            <div class="total">
+                <p>Total: $0.00</p>
+                <button id="procesar-pago">Procesar Pago</button>
+            </div>
+        </aside>
+    </main>
+
+    <script src="/js/productos.js"></script>
+
+    <script>
+        // Función simple de logout
+        function logout() {
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

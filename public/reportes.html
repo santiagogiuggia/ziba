@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes de Venta - Café del Día</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="stylereportes.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Reportes de Venta</h1>
+        <nav>
+            <a href="index.html">Punto de Venta</a>
+            <a href="admin.html">Administrar</a>
+            <button id="logout-btn">Cerrar Sesión</button>
+        </nav>
+    </header>
+
+    <main id="reports-main">
+        <section class="daily-summary card">
+            <h2>Cierre del Día (Hoy)</h2>
+            <div class="report-summary" id="daily-metrics"></div>
+            <div class="daily-products-sold">
+                <h3>Productos Vendidos Hoy</h3>
+                <ul id="daily-products-list"></ul>
+            </div>
+        </section>
+
+        <section class="weekly-report card">
+            <h2>Popularidad de Productos por Día de la Semana</h2>
+            <p>Este reporte te ayuda a decidir qué cocinar o preparar más cada día.</p>
+            <div id="weekly-report-container">
+                <table id="weekly-report-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Domingo</th>
+                            <th>Lunes</th>
+                            <th>Martes</th>
+                            <th>Miércoles</th>
+                            <th>Jueves</th>
+                            <th>Viernes</th>
+                            <th>Sábado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="report-filters card">
+            <h2>Reportes Históricos</h2>
+            <div class="filter-group">
+                <label for="startDate">Desde:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="filter-group">
+                <label for="endDate">Hasta:</label>
+                <input type="date" id="endDate">
+            </div>
+            <button id="filterBtn">Aplicar Filtro</button>
+            <button id="resetBtn">Mostrar Todo</button>
+        </section>
+
+        <section class="report-charts card">
+            <h2>Visualización de Datos (Histórico)</h2>
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h3>Top Productos Vendidos</h3>
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h3>Ingresos por Categoría</h3>
+                    <canvas id="categoryRevenueChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="report-table card">
+            <h2>Detalle de Ventas (Histórico)</h2>
+            <table id="salesDetailTable">
+                <thead>
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Fecha</th>
+                        <th>N° Items</th>
+                        <th>Método de Pago</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+        
+        <section class="report-actions card">
+            <h2>Acciones</h2>
+            <button id="clearDataBtn" class="danger">Borrar Historial de Ventas</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Café del Día. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script src="reportes.js"></script>
+</body>
+</html>

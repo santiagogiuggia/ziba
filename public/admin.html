@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración - Café del Día</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Panel de Administración</h1>
+        <nav>
+            <a href="index.html">Punto de Venta</a>
+            <a href="reportes.html">Ver Reportes</a>
+            <button id="logout-btn">Cerrar Sesión</button>
+        </nav>
+    </header>
+    <main class="admin-main">
+        <section class="admin-section card">
+            <h2>Gestión de Productos</h2>
+            <div id="menu-list-container"></div>
+        </section>
+        <aside class="admin-section card">
+            <h2 id="form-title">Añadir Nuevo Producto</h2>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <div class="form-group"><label for="product-name">Nombre:</label><input type="text" id="product-name" required></div>
+                <div class="form-group"><label for="product-category">Categoría:</label><input type="text" id="product-category" required list="category-list"><datalist id="category-list"></datalist></div>
+                <div class="form-group"><label for="product-stock">Stock Inicial:</label><input type="number" id="product-stock" value="99" required></div>
+                <fieldset><legend>Precios por Tamaño</legend>
+                    <div class="form-group-inline"><label for="price-pocillo">Pocillo:</label><input type="text" id="price-pocillo"></div>
+                    <div class="form-group-inline"><label for="price-jarro">Jarro:</label><input type="text" id="price-jarro"></div>
+                    <div class="form-group-inline"><label for="price-mediano">Mediano/Único:</label><input type="text" id="price-mediano"></div>
+                    <div class="form-group-inline"><label for="price-grande">Grande:</label><input type="text" id="price-grande"></div>
+                </fieldset>
+                <div class="form-actions"><button type="submit" id="save-btn">Guardar Producto</button><button type="button" id="cancel-btn" style="display: none;">Cancelar Edición</button></div>
+            </form>
+        </aside>
+        <section class="admin-section card">
+            <h2>Configuración de Mercado Pago</h2>
+            <form id="mp-form">
+                <div class="form-group"><label for="mp-token">Access Token:</label><input type="text" id="mp-token" required></div>
+                <div class="form-actions"><button type="submit">Guardar Token</button></div>
+                <p id="mp-status" class="status-message"></p>
+            </form>
+        </section>
+        <section class="admin-section card">
+            <h2>Gestión de Ingredientes</h2>
+            <div id="ingredients-list-container"></div>
+            <hr>
+            <form id="ingredient-form">
+                <h3>Añadir Nuevo Ingrediente</h3>
+                <div class="form-group"><label for="ingredient-name">Nombre:</label><input type="text" id="ingredient-name" required></div>
+                <div class="form-group-inline">
+                    <div class="form-group" style="flex: 2;"><label for="ingredient-stock">Stock Inicial:</label><input type="number" id="ingredient-stock" step="0.01" required></div>
+                    <div class="form-group" style="flex: 1;"><label for="ingredient-unit">Unidad:</label><input type="text" id="ingredient-unit" placeholder="gr, kg, l, u" required></div>
+                </div>
+                <div class="form-actions"><button type="submit">Guardar Ingrediente</button></div>
+            </form>
+        </section>
+    </main>
+    <script src="auth.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

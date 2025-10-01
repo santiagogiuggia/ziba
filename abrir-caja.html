@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abrir Caja - Café del Día</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+    <div class="login-container card">
+        <h1>Abrir Caja</h1>
+        <p>Ingresa los datos para iniciar el turno.</p>
+        <form id="abrir-caja-form">
+            <div class="form-group">
+                <label for="monto_inicial">Monto Inicial en Caja ($)</label>
+                <input type="number" step="0.01" id="monto_inicial" required>
+            </div>
+            <div class="form-group">
+                <label for="cajero">Nombre del Cajero</label>
+                <input type="text" id="cajero" required>
+            </div>
+            <div class="form-group">
+                <label for="barista">Nombre del Barista (opcional)</label>
+                <input type="text" id="barista">
+            </div>
+            <button type="submit" class="login-btn">Iniciar Turno</button>
+            <p id="abrir-caja-error" class="error-message"></p>
+        </form>
+    </div>
+    <script src="session.js"></script>
+</body>
+</html>

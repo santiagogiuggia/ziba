@@ -1,0 +1,20 @@
+# Ignorar la carpeta de dependencias de Node.js
+node_modules/
+
+# Ignorar el archivo de la base de datos de SQLite
+*.db
+
+# Ignorar archivos de registro y del sistema
+npm-debug.log*
+.DS_Store
+# Dependencias de Node.js
+node_modules/
+
+# Base de datos
+*.db
+
+# Archivos de registro
+npm-debug.log*
+
+# Archivos del sistema operativo
+.DS_Store

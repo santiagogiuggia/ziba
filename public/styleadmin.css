@@ -1,0 +1,19 @@
+.admin-main { flex-direction: column; gap: 20px; width: 100%; overflow-y: auto; }
+.admin-section { flex: 1; min-width: 350px; }
+#menu-list-container { max-height: 70vh; overflow-y: auto; }
+.admin-category h3 { border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-top: 20px; color: var(--primary-color); }
+.admin-category:first-child h3 { margin-top: 0; }
+.admin-product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; border-bottom: 1px solid #f0f0f0; }
+.item-actions button { margin-left: 5px; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-family: var(--font-family); }
+.item-actions .edit-btn { background-color: var(--accent-color-warning); }
+.item-actions .delete-btn { background-color: var(--accent-color-danger); color: white; }
+#product-form .form-group, #product-form fieldset { margin-bottom: 15px; }
+#product-form label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; }
+#product-form input[type="text"], #product-form input[type="number"] { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: var(--font-family); box-sizing: border-box; }
+#product-form fieldset { border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; }
+.form-group-inline { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.form-group-inline label { flex-basis: 100px; margin-bottom: 0; }
+.form-actions { display: flex; gap: 10px; margin-top: 20px; }
+.form-actions button { flex-grow: 1; padding: 12px; font-size: 1.1em; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; }
+#save-btn { background-color: var(--accent-color-success); color: white; }
+#cancel-btn { background-color: #6c757d; color: white; }

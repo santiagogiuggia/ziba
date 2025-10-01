@@ -1,0 +1,128 @@
+#reports-main {
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.report-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.summary-card {
+    text-align: center;
+}
+
+.daily-summary h2 {
+    text-align: center;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.daily-products-sold {
+    margin-top: 30px;
+}
+
+.daily-products-sold h3 {
+    color: var(--secondary-color);
+}
+
+#daily-products-list {
+    list-style-type: none;
+    padding: 0;
+    column-count: 2;
+    column-gap: 20px;
+}
+
+#daily-products-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    width: 100%;
+}
+
+.chart-wrapper {
+    flex: 1;
+    min-width: 300px;
+    height: 400px;
+    position: relative;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.report-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.report-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.report-table th, .report-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.report-table th {
+    background-color: #f8f8f8;
+}
+
+.report-actions button.danger {
+    background-color: var(--accent-color-danger);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.weekly-report p {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: -10px;
+}
+
+#weekly-report-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 20px;
+}
+
+#weekly-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+#weekly-report-table th, #weekly-report-table td {
+    padding: 10px 8px;
+    border: 1px solid var(--border-color);
+}
+
+#weekly-report-table th {
+    background-color: #f8f8f8;
+    position: sticky;
+    top: 0;
+}
+
+#weekly-report-table tbody td:first-child {
+    text-align: left;
+    font-weight: 600;
+}

@@ -1,0 +1,17 @@
+{
+  "name": "ziba-cafe-pos",
+  "version": "1.0.0",
+  "description": "Sistema de Punto de Venta para ZIBA Café",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mercadopago": "^2.0.9",
+    "sqlite3": "^5.1.7"
+  }
+}
