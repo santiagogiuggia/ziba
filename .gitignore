@@ -1,20 +1,14 @@
 # Ignorar la carpeta de dependencias de Node.js
+# Esta carpeta contiene miles de archivos y se puede reinstalar con "npm install"
 node_modules/
 
 # Ignorar el archivo de la base de datos de SQLite
+# Es una buena práctica no subir la base de datos directamente al repositorio
 *.db
+*.db-journal
 
-# Ignorar archivos de registro y del sistema
-npm-debug.log*
-.DS_Store
-# Dependencias de Node.js
-node_modules/
-
-# Base de datos
-*.db
-
-# Archivos de registro
+# Ignorar archivos de registro de npm
 npm-debug.log*
 
-# Archivos del sistema operativo
+# Ignorar archivos del sistema operativo (comunes en macOS y Windows)
 .DS_Store
